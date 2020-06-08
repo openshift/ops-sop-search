@@ -14,6 +14,7 @@ type Sop struct {
 	Commit       string    `json:"commit"`
 	Content      string    `json:"content"`
 	Tags         []string  `json:"tags"`
+	Links        []string  `json:"links"`
 }
 
 //the map will have SOP name as key and JSON object as value in string
