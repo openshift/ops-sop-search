@@ -5,21 +5,28 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type MDFile struct {
-	Path    string
-	Name    string
-	Content string
-	Tags    []string
+	Path         string
+	Name         string
+	Content      string
+	Author       []string
+	CreationDate time.Time
+	LastUpdated  time.Time
+	Tags         []string
 	//possibly add []string for tags?
 }
 
 type ADFile struct {
-	Path    string
-	Name    string
-	Content string
-	Tags    []string
+	Path         string
+	Name         string
+	Content      string
+	Author       []string
+	CreationDate time.Time
+	LastUpdated  time.Time
+	Tags         []string
 }
 
 //Scans for files ending in ".md", then creates an MDFile obj for each
@@ -53,9 +60,24 @@ func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
 			return []MDFile{}, []ADFile{}, err
 		}
 		cont := string(content)
+		//getting author names and dates!
+		git, err := GitLog(f) //CHANGED
+		if err != nil {
+			return []MDFile{}, []ADFile{}, err
+		}
+		//old, new, err := AddData(git)
+		auth, dat, err := GetAuthorsAndDates(git)
+		if err != nil {
+			return []MDFile{}, []ADFile{}, err
+		}
+		// var authors []string
+		// authors = append(authors, old.Name, new.Name)
+		// first := old.Date
+		// last := new.Date
+		//getting tags
 		tags := strings.Split(filepath.Dir(f), "/")
 		tags = append(tags, "markdown")
-		mfiles = append(mfiles, MDFile{path, name, cont, tags})
+		mfiles = append(mfiles, MDFile{path, name, cont, auth, dat.Oldest, dat.Newest, tags})
 	}
 
 	//creates ADFile objects and adds them to slice
@@ -67,9 +89,22 @@ func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
 			return []MDFile{}, []ADFile{}, err
 		}
 		cont := string(content)
+		git, err := GitLog(f) //CHANGED
+		if err != nil {
+			return []MDFile{}, []ADFile{}, err
+		}
+		//old, new, err := AddData(git)
+		auth, dat, err := GetAuthorsAndDates(git)
+		if err != nil {
+			return []MDFile{}, []ADFile{}, err
+		}
+		// var authors []string
+		// authors = append(authors, old.Name, new.Name)
+		// first := old.Date
+		// last := new.Date
 		tags := strings.Split(filepath.Dir(f), "/")
 		tags = append(tags, "asciidoc")
-		afiles = append(afiles, ADFile{path, name, cont, tags})
+		afiles = append(afiles, ADFile{path, name, cont, auth, dat.Oldest, dat.Newest, tags})
 	}
 
 	return mfiles, afiles, nil
@@ -121,6 +156,9 @@ func ToBulkSOP(mf []MDFile, af []ADFile) ([]Sop, error) {
 		sop.Path = x.Path
 		sop.Name = x.Name
 		sop.Content = x.Content
+		sop.Author = x.Author
+		sop.CreationDate = x.CreationDate
+		sop.LastUpdated = x.LastUpdated
 		sop.Tags = x.Tags
 		slice = append(slice, sop)
 	}
@@ -130,6 +168,9 @@ func ToBulkSOP(mf []MDFile, af []ADFile) ([]Sop, error) {
 		sop.Path = y.Path
 		sop.Name = y.Name
 		sop.Content = y.Content
+		sop.Author = y.Author
+		sop.CreationDate = y.CreationDate
+		sop.LastUpdated = y.LastUpdated
 		sop.Tags = y.Tags
 		slice = append(slice, sop)
 	}

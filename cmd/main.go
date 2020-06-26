@@ -1,40 +1,28 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"log"
+	"os"
 
 	sopsearch "github.com/lareplog/ops-sop-search"
 )
 
+func init() {
+
+	os.Mkdir("/home/laurenreplogle/test", os.FileMode(0777))
+	os.Chdir("/home/laurenreplogle/test")
+
+	_, err := sopsearch.GitClone("git@github.com:openshift/ops-sop.git")
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	os.Chdir("ops-sop") //need to be in the directory first!
+	sopsearch.Run(true) //automatically true so it will do initial index!
+}
+
 func main() {
-	start := time.Now()
-	ec, err := sopsearch.NewElasticClient(
-		[]string{"http://localhost:9200"},
-		"user",
-		"pass",
-	)
-	if err != nil {
-		fmt.Println(err)
-	}
-	//set up everything so IndexSOP goes successfully lol
-	md, ad, err := sopsearch.ScanForFiles("/home/laurenreplogle/ops-sop")
-	if err != nil {
-		fmt.Println(err)
-	}
-	sop, err := sopsearch.ToBulkSOP(md, ad)
-	if err != nil {
-		fmt.Println(err)
-	}
-	jmap, err := sopsearch.ToBulkJSON(sop)
-	if err != nil {
-		fmt.Println(err)
-	}
-	err = sopsearch.IndexSOP(&ec, jmap)
-	if err != nil {
-		fmt.Println(err)
-	}
-	elapsed := time.Since(start)
-	fmt.Println("success!")
-	fmt.Println(elapsed)
+
+	sopsearch.Routine()
+	//time.Sleep(11 * time.Minute)
 }
