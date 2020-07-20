@@ -29,11 +29,6 @@ func NewElasticClient(addresses []string, username, password string) (ElasticCli
 	return ElasticClient{client}, nil
 }
 
-func (ec *ElasticClient) Info() (*esapi.Response, error) {
-	res, err := ec.esclient.Info()
-	return res, err
-}
-
 func (ec *ElasticClient) CreateOrUpdateIndex(index, documentID, body string) error {
 
 	// Instantiate a request object

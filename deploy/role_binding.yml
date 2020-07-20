@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sop-search
+  namespace: sop-search
+subjects:
+- kind: ServiceAccount
+  name: sop-search
+  namespace: sop-search
+roleRef:
+  kind: Role
+  name: sop-search
+  apiGroup: rbac.authorization.k8s.io
+  namespace: sop-search

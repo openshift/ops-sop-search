@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sop-search
+  labels:
+    name: sop-search
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: sop-search
+  template:
+    metadata:
+      labels: 
+        name: sop-search
+    spec:
+      serviceAccountName: sop-search
+      containers:
+        - name: sop-elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+          env:
+            - name : discovery.type
+              value: single-node
+        - name: sop-search
+          image: quay.io/lreplogl/sop-search:latest
+          volumeMounts:
+          - name: githubkey
+            mountPath: "/etc/ssh"
+            readOnly: true
+      volumes:
+      - name: githubkey
+        secret:
+          secretName: ssh
+          items:
+          - key: ssh-privatekey
+            path: id_rsa
+          - key: ssh-publickey
+            path: id_rsa.pub
+        

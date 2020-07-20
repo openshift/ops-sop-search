@@ -17,18 +17,6 @@ type Sop struct {
 	Links        []string  `json:"links"`
 }
 
-//the map will have SOP name as key and JSON object as value in string
-func (s Sop) toJSON() (map[string]string, error) {
-	var jmap map[string]string
-	obj, err := json.Marshal(s)
-	if err != nil {
-		return map[string]string{}, err
-	}
-	jmap[s.Name] = string(obj)
-	//shouldn't i be doing this for all SOPs?
-	return jmap, nil
-}
-
 func ToBulkJSON(s []Sop) (map[string]string, error) {
 	jmap := make(map[string]string)
 	for _, f := range s {

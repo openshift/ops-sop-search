@@ -6,16 +6,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/jasonlvhit/gocron"
+	"github.com/pkg/errors"
 )
 
 type Indexer interface {
 	CreateOrUpdateIndex(index, documentID, body string) error
 }
 
-//call func from mdparser that grabs mdfile, convert it into sop struct
-//  convert sop struct into json slice of bytes ->string
-//    for each string, create index
 func IndexSOP(indexer Indexer, sops map[string]string) error {
 	for key, content := range sops {
 		err := indexer.CreateOrUpdateIndex("sop", key, content)
@@ -26,63 +23,63 @@ func IndexSOP(indexer Indexer, sops map[string]string) error {
 	return nil
 }
 
-func Run(index bool) {
+func RunIndex(index bool, config Config) error {
 
-	//if it does need to be reindexed, reindex!
 	if index {
+
+		log.Printf("Indexing %s now...\n", config.RepoName)
+
 		start := time.Now()
+
 		ec, err := NewElasticClient(
-			[]string{"http://localhost:9200"},
-			"user",
-			"pass",
-		)
+			[]string{config.ElasticURL}, "", "")
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
-		//os.Chdir("/home/laurenreplogle/ops-sop")
-		path, er := os.Getwd()
-		if er != nil {
-			log.Println(er)
+
+		path, err := os.Getwd()
+		if err != nil {
+			return err
 		}
+
 		md, ad, err := ScanForFiles(path)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
+
 		sop, err := ToBulkSOP(md, ad)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
+
 		jmap, err := ToBulkJSON(sop)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
+
 		err = IndexSOP(&ec, jmap)
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
+
 		elapsed := time.Since(start)
-		fmt.Println("success!")
-		fmt.Println(elapsed)
+		log.Printf("Indexing complete! Time elapsed: %v\n", elapsed)
 	}
+	return nil
 }
 
-func needReIndex() {
+func NeedReIndex(config Config) error {
 
-	ret, err := GitPull()
+	ret, err := GitPull(config.GitScript)
 	if err != nil {
-		//if error occurs, stop! log.Panic?
-		log.Panicln(err)
+		msg := fmt.Sprintf("Could not pull repo %s\n error: %s\n", config.RepoName, err)
+		return errors.Wrap(err, msg)
 	}
 
-	if string(ret) == string("Already up to date.\n") {
-		Run(false)
-	} else {
-		Run(true)
+	if string(ret) != string("Already up to date.\n") {
+		return RunIndex(true, config)
 	}
-}
 
-func Routine() {
-
-	gocron.Every(2).Minute().Do(needReIndex)
-	<-gocron.Start()
+	log.Printf("Repo %s is up to date, no need to re-index.\n", config.RepoName)
+	return RunIndex(false, config)
 }

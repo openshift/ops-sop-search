@@ -11,15 +11,15 @@ type Dates struct {
 	Newest time.Time
 }
 
-func GitClone(repo string) ([]byte, error) {
+func GitClone(script string, repo string) error {
 
-	cmd := exec.Command("git", "clone", repo)
-	return cmd.Output()
+	cmd := exec.Command("sh", script, "-c", repo)
+	return cmd.Run()
 }
 
-func GitPull() ([]byte, error) {
-	//in order to do this, need to be in ops-sop no matter what
-	cmd := exec.Command("git", "pull", "origin")
+func GitPull(script string) ([]byte, error) {
+
+	cmd := exec.Command("sh", script, "-p")
 	return cmd.Output()
 }
 
