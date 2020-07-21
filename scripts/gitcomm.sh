@@ -2,9 +2,9 @@
 
 # -p = pull, -c = clone
 
-#to pull: sh scripts/gitcomm.sh -p
+#to pull: sh gitcomm.sh -p
 
-#to clone: sh scripts/gitcomm.sh -c repotoclone
+#to clone: sh gitcomm.sh -c repotoclone
 
 while getopts ":pc:" opt; do
   case $opt in

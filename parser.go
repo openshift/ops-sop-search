@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// MDFile is the struct for a markdown file
 type MDFile struct {
 	Path         string
 	Name         string
@@ -18,6 +19,7 @@ type MDFile struct {
 	Tags         []string
 }
 
+// ADFile is the struct for a asciidoc file
 type ADFile struct {
 	Path         string
 	Name         string
@@ -28,8 +30,10 @@ type ADFile struct {
 	Tags         []string
 }
 
-// ScanForFiles scans for files ending in ".md", then creates an MDFile obj for each
-// file and then adds it to the slice. the slice is returned at the end.
+// ScanForFiles scans the ops-sop directory and finds files ending in .md or .asciidoc
+//and then it will take all of those files and put them inside of a MDFile or ADFile object
+//respectively. It also performs a GitLog to find authors and dates for files, and will grab other
+//data from the files to put into the object.
 func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
 
 	var mfiles []MDFile
@@ -91,8 +95,9 @@ func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
 	return mfiles, afiles, nil
 }
 
-//searches the given root and using the pattern, it finds all the files that end
-// in that particular pattern.
+// FindFiles takes a path to a directory and a pattern (in this case, the type of file) and
+//looks through the entire directory and adds all the paths for the files that match the pattern
+//into a slice of strings which it returns.
 func FindFiles(root, pattern string) ([]string, error) {
 	var matches []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -115,6 +120,8 @@ func FindFiles(root, pattern string) ([]string, error) {
 	return matches, nil
 }
 
+// ToBulkSOP takes a slice of MDFile objects and a slice of ADFile objects and turns both
+//into SOP objects and then returns a slice containing all of them as SOP objects.
 func ToBulkSOP(mf []MDFile, af []ADFile) ([]Sop, error) {
 
 	var sop Sop

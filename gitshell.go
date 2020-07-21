@@ -6,29 +6,40 @@ import (
 	"time"
 )
 
+// Dates contains the creation date of the SOP document and the date it was last updated
 type Dates struct {
 	Oldest time.Time
 	Newest time.Time
 }
 
+// GitClone performs a git clone of repo contained in the repo string. The script string
+//containts the location of the shell script that performs the git clone.
 func GitClone(script string, repo string) error {
 
 	cmd := exec.Command("sh", script, "-c", repo)
 	return cmd.Run()
 }
 
+// GitPull performs a git pull of the repo. The script string contains the location
+//of the shell script that performs the git pull. It will then return the output of
+//the git pull to determine if the repo was actually updated or not.
 func GitPull(script string) ([]byte, error) {
 
 	cmd := exec.Command("sh", script, "-p")
 	return cmd.Output()
 }
 
+// GitLog performs a git log of a file specified by the filepath string. It then returns
+//the output of the command.
 func GitLog(filepath string) ([]byte, error) {
 
 	cmd := exec.Command("git", "log", "--pretty=%an%x09%ai", filepath)
 	return cmd.Output()
 }
 
+// GetAuthorsAndDates takes the slice of bytes (data) which contains the git log of a file
+//and then goes through and finds all the unique authors of the file as well as the creation
+//date and date the file was last updated and then returns that information.
 func GetAuthorsAndDates(data []byte) ([]string, Dates, error) {
 
 	var auths []string
@@ -63,6 +74,9 @@ func GetAuthorsAndDates(data []byte) ([]string, Dates, error) {
 	return auths, date, nil
 }
 
+// isUnique checks the list of authors against a potential author to see if they
+//are already in the list. If they aren't it will return true. If it is in the list
+//it will return false.
 func isUnique(list []string, pot string) bool {
 	for _, str := range list {
 		if str == pot {

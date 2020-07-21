@@ -8,10 +8,13 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
 
+// ElasticClient struct holds the elasticsearch client
 type ElasticClient struct {
 	esclient *elasticsearch.Client
 }
 
+// NewElasticClient creates a new elastic client which lets SOPs be indexed
+//into the elasticsearch cluster.
 func NewElasticClient(addresses []string, username, password string) (ElasticClient, error) {
 
 	cfg := elasticsearch.Config{
@@ -29,6 +32,8 @@ func NewElasticClient(addresses []string, username, password string) (ElasticCli
 	return ElasticClient{client}, nil
 }
 
+// CreateOrUpdateIndex will instantiate a request object and then perform the request.
+//In this particular case, it will create or update each index for an SOP.
 func (ec *ElasticClient) CreateOrUpdateIndex(index, documentID, body string) error {
 
 	// Instantiate a request object

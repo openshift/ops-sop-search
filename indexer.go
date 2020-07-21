@@ -9,10 +9,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+//Indexer interface which allows indexer to create or update an index
 type Indexer interface {
 	CreateOrUpdateIndex(index, documentID, body string) error
 }
 
+//IndexSOP takes the map holding the SOPs and indexes them or updates the index that
+//already exists.
 func IndexSOP(indexer Indexer, sops map[string]string) error {
 	for key, content := range sops {
 		err := indexer.CreateOrUpdateIndex("sop", key, content)
@@ -23,6 +26,10 @@ func IndexSOP(indexer Indexer, sops map[string]string) error {
 	return nil
 }
 
+//RunIndex performs the indexing. If the index bool is true, then this function will
+//perform the indexing routine. If the bool is false, then it won't index. The Config
+//object is used to get the elasticsearch url. Once it finishes the indexing routine,
+//it will print out how much time it took to index the SOP documents.
 func RunIndex(index bool, config Config) error {
 
 	if index {
@@ -68,6 +75,9 @@ func RunIndex(index bool, config Config) error {
 	return nil
 }
 
+//NeedReIndex performs a git pull to determine if a re-indexing needs to occur. If
+//the repo is already up to date, then it will do a RunIndex with false. If it's not,
+//then it wil return RunIndex with true.
 func NeedReIndex(config Config) error {
 
 	ret, err := GitPull(config.GitScript)

@@ -8,6 +8,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// Config struct holds all the important values used across the program.
 type Config struct {
 	Time       int
 	ElasticURL string
@@ -16,6 +17,9 @@ type Config struct {
 	GitScript  string
 }
 
+// GetConfig uses a Kubernetes client and then gets the configmap object. Then it puts
+//the data from that configmap object into the Config object which can then be used and
+//accessed across the whole program.
 func GetConfig(kubecli client.Client) (Config, error) {
 	var confmap v1.ConfigMap
 

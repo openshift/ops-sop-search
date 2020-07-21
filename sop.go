@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Sop struct contains all the information that will be in the index for the sop document
 type Sop struct {
 	Name         string    `json:"name"`
 	Path         string    `json:"path"`
@@ -17,6 +18,9 @@ type Sop struct {
 	Links        []string  `json:"links"`
 }
 
+// ToBulkJSON takes all the Sop objects and puts them into the map that will be used
+//when calling IndexSOP after encoding the Sop into JSON. The name of the SOP will be
+//the key and the json encoded sop as the value for the key-value pair.
 func ToBulkJSON(s []Sop) (map[string]string, error) {
 	jmap := make(map[string]string)
 	for _, f := range s {

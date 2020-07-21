@@ -10,6 +10,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// GetKubeClient creates a Kubernetes client which can be used to access
+//the ConfigMap stored on the oc environment.
 func GetKubeClient() (client.Client, error) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
@@ -26,6 +28,8 @@ func GetKubeClient() (client.Client, error) {
 	return cli, nil
 }
 
+// getConfigMap uses the Kubernetes client and context to get the ConfigMap that
+//stores various different values used throughout the program.
 func getConfigMap(ctx context.Context, cli client.Client) (v1.ConfigMap, error) {
 	var cmap v1.ConfigMap
 	if err := cli.Get(ctx, types.NamespacedName{
