@@ -8,11 +8,12 @@ elasticsearch container as a way of making it easier to find an SOP document.
 After the program indexes the SOP documents into the elasticsearch container, the user can then search for specific documents based on the name, the authors, the content, etc. using curl commands once inside the elasticsearch container.
 
 **Example** 
+
 `curl -X GET 'http://localhost:9200/sop/_search?q=_id%3Alogging'`
 
 ## How to Deploy
 
-** Additional Files Not Included **
+**Additional Files Not Included**
 1. secret.yml file 
 
 ```
