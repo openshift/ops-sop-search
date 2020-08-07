@@ -17,7 +17,7 @@ spec:
       serviceAccountName: sop-search
       containers:
         - name: sop-elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+          image: quay.io/lreplogl/elasticsearch:latest
           env:
             - name : discovery.type
               value: single-node
@@ -27,6 +27,12 @@ spec:
           - name: githubkey
             mountPath: "/etc/ssh"
             readOnly: true
+        - name: sop-ui
+          image: quay.io/lreplogl/search-ui:latest
+          port:
+          - containerPort: 9000
+            protocol: TCP
+      restartPolicy: Always
       volumes:
       - name: githubkey
         secret:

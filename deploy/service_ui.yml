@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sop-search-ui
+  namespace: sop-search   
+spec:
+  selector:                  
+    name: sop-search
+  ports:
+  - nodePort: 0
+    port: 5000               
+    protocol: TCP
+    targetPort: 5000 

@@ -23,10 +23,9 @@ func init() {
 		log.Printf("Failed to get config object.\n error: %s\n", err)
 		os.Exit(1)
 	}
-
-	err = sopsearch.GitClone(conf.GitScript, conf.RepoURL)
+	err = sopsearch.GitClone(conf.GitScript, conf.GitURL)
 	if err != nil {
-		log.Printf("Failed to clone repo %s.\n error: %s\n", conf.RepoURL, err)
+		log.Printf("Failed to clone repo %s.\n error: %s\n", conf.GitURL, err)
 		os.Exit(1)
 	}
 

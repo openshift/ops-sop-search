@@ -12,9 +12,10 @@ import (
 type Config struct {
 	Time       int
 	ElasticURL string
-	RepoURL    string
+	GitURL     string
 	RepoName   string
 	GitScript  string
+	RepoURL    string
 }
 
 // GetConfig uses a Kubernetes client and then gets the configmap object. Then it puts
@@ -33,6 +34,7 @@ func GetConfig(kubecli client.Client) (Config, error) {
 		RepoURL:    confmap.Data["repourl"],
 		RepoName:   confmap.Data["reponame"],
 		GitScript:  confmap.Data["gitscript"],
+		GitURL:     confmap.Data["giturl"],
 	}
 	config.Time, err = strconv.Atoi(confmap.Data["time"])
 	if err != nil {

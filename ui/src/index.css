@@ -1,0 +1,24 @@
+@import url('../node_modules/searchkit/release/theme.css');
+
+.my-logo {
+  color:white;
+  flex:0 0 250px;
+  padding:13px 20px;
+  margin-right:25px;
+  line-height: 16px;
+  font-family: 'Red Hat Display', sans-serif;
+  text-align: center;
+}
+.top {
+  color: #BE0000;
+  font-family: 'Red Hat Display', sans-serif;
+}
+.body {
+  font-family: 'Red Hat Display', sans-serif;
+}
+.heading {
+  font-weight: 700;
+}
+.subheading {
+  font-weight: 300;
+}

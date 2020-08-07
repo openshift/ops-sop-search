@@ -17,6 +17,7 @@ type MDFile struct {
 	CreationDate time.Time
 	LastUpdated  time.Time
 	Tags         []string
+	Link         string
 }
 
 // ADFile is the struct for a asciidoc file
@@ -28,13 +29,14 @@ type ADFile struct {
 	CreationDate time.Time
 	LastUpdated  time.Time
 	Tags         []string
+	Link         string
 }
 
 // ScanForFiles scans the ops-sop directory and finds files ending in .md or .asciidoc
 //and then it will take all of those files and put them inside of a MDFile or ADFile object
 //respectively. It also performs a GitLog to find authors and dates for files, and will grab other
 //data from the files to put into the object.
-func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
+func ScanForFiles(path string, config Config) ([]MDFile, []ADFile, error) {
 
 	var mfiles []MDFile
 
@@ -51,6 +53,11 @@ func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
 	}
 
 	for _, f := range mdmatches {
+
+		var linkBuild strings.Builder
+		var link string
+		linkBuild.WriteString(config.RepoURL)
+
 		path := f
 		name := strings.TrimSuffix(filepath.Base(f), filepath.Ext(filepath.Base(f)))
 		content, err := ioutil.ReadFile(f)
@@ -67,11 +74,29 @@ func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
 			return []MDFile{}, []ADFile{}, err
 		}
 		tags := strings.Split(filepath.Dir(f), "/")
+
+		if tags[len(tags)-1] == "ops-sop" {
+			linkBuild.WriteString(filepath.Base(f))
+			link = linkBuild.String()
+		} else {
+			sop := indexOf("ops-sop", tags)
+			for i := sop + 1; i < len(tags); i++ {
+				linkBuild.WriteString(tags[i])
+			}
+			linkBuild.WriteString(filepath.Base(f))
+			link = linkBuild.String()
+		}
+
 		tags = append(tags, "markdown")
-		mfiles = append(mfiles, MDFile{path, name, cont, auth, dat.Oldest, dat.Newest, tags})
+		mfiles = append(mfiles, MDFile{path, name, cont, auth, dat.Oldest, dat.Newest, tags, link})
 	}
 
 	for _, f := range admatches {
+
+		var linkBuild strings.Builder
+		var link string
+		linkBuild.WriteString(config.RepoURL)
+
 		path := f
 		name := strings.TrimSuffix(filepath.Base(f), filepath.Ext(filepath.Base(f)))
 		content, err := ioutil.ReadFile(f)
@@ -88,8 +113,24 @@ func ScanForFiles(path string) ([]MDFile, []ADFile, error) {
 			return []MDFile{}, []ADFile{}, err
 		}
 		tags := strings.Split(filepath.Dir(f), "/")
+
+		if tags[len(tags)-1] == "ops-sop" {
+			linkBuild.WriteString(filepath.Base(f))
+			link = linkBuild.String()
+		} else {
+			sop := indexOf("ops-sop", tags)
+			for i := sop + 1; i < len(tags); i++ {
+				linkBuild.WriteString(tags[i])
+				linkBuild.WriteString("/")
+			}
+			linkBuild.WriteString(filepath.Base(f))
+			link = linkBuild.String()
+		}
+
 		tags = append(tags, "asciidoc")
-		afiles = append(afiles, ADFile{path, name, cont, auth, dat.Oldest, dat.Newest, tags})
+		tags = tags[indexOf("ops-sop", tags):]
+		tags = append(tags, link)
+		afiles = append(afiles, ADFile{path, name, cont, auth, dat.Oldest, dat.Newest, tags, link})
 	}
 
 	return mfiles, afiles, nil
@@ -135,6 +176,7 @@ func ToBulkSOP(mf []MDFile, af []ADFile) ([]Sop, error) {
 		sop.CreationDate = x.CreationDate
 		sop.LastUpdated = x.LastUpdated
 		sop.Tags = x.Tags
+		sop.Link = x.Link
 		slice = append(slice, sop)
 	}
 
@@ -146,8 +188,18 @@ func ToBulkSOP(mf []MDFile, af []ADFile) ([]Sop, error) {
 		sop.CreationDate = y.CreationDate
 		sop.LastUpdated = y.LastUpdated
 		sop.Tags = y.Tags
+		sop.Link = y.Link
 		slice = append(slice, sop)
 	}
 
 	return slice, nil
+}
+
+func indexOf(element string, data []string) int {
+	for k, v := range data {
+		if element == v {
+			return k
+		}
+	}
+	return -1 //not found.
 }

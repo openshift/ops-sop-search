@@ -49,7 +49,7 @@ func RunIndex(index bool, config Config) error {
 			return err
 		}
 
-		md, ad, err := ScanForFiles(path)
+		md, ad, err := ScanForFiles(path, config)
 		if err != nil {
 			return err
 		}

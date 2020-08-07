@@ -1,0 +1,13 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: sop-search-elastic
+  namespace: sop-search
+spec:
+  to:
+    kind: Service
+    name: sop-search-service
+    weight: 100
+  port:
+    targetPort: 9200
+  wildcardPolicy: None

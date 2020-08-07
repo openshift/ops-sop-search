@@ -15,7 +15,7 @@ type Sop struct {
 	Commit       string    `json:"commit"`
 	Content      string    `json:"content"`
 	Tags         []string  `json:"tags"`
-	Links        []string  `json:"links"`
+	Link         string    `json:"links"`
 }
 
 // ToBulkJSON takes all the Sop objects and puts them into the map that will be used
