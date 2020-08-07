@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/jasonlvhit/gocron"
-	sopsearch "github.com/lareplog/ops-sop-search"
+	sopsearch "github.com/openshift/ops-sop-search"
 )
 
 func init() {
