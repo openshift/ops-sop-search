@@ -1,4 +1,4 @@
-module github.com/lareplog/ops-sop-search
+module github.com/openshift/ops-sop-search
 
 go 1.14
 
