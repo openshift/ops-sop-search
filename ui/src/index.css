@@ -1,3 +1,12 @@
+.sk-layout__top-bar {
+  background-color: #BE0000
+}
+.sk-search-box input.sk-search-box__text {
+  font-family: 'Red Hat Display', sans-serif;
+}
+.sk-input-filter__text {
+  font-family: 'Red Hat Display', sans-serif;
+}
 @import url('../node_modules/searchkit/release/theme.css');
 
 .my-logo {
@@ -10,7 +19,7 @@
   text-align: center;
 }
 .top {
-  color: #BE0000;
+  color: #BE0000 !important;
   font-family: 'Red Hat Display', sans-serif;
 }
 .body {
