@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+  namespace: sop-search
+data:
+  time: "5" (number of minutes before restarting routine)
+  elastic: http://localhost:9200 (location of elasticsearch data)
+  repourl: https://github.com/openshift/ops-sop-search/blob/master/ (repo url used for creating links)
+  reponame: ops-sop-search (name of the repository you're indexing)
+  gitscript: script.sh (location of the shell script)
+  giturl: git@github.com:openshift/ops-sop-search.git (clone with ssh)

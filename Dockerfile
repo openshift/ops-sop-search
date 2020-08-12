@@ -13,8 +13,6 @@ RUN chmod 0777 /build
 
 COPY . .
 
-COPY deploy/ssh_config.template /etc/ssh/ssh_config
-
 RUN go mod download 
 
 RUN go build cmd/main.go
