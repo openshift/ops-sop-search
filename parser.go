@@ -88,6 +88,8 @@ func ScanForFiles(path string, config Config) ([]MDFile, []ADFile, error) {
 		}
 
 		tags = append(tags, "markdown")
+		tags = tags[indexOf("ops-sop", tags):]
+		tags = append(tags, link)
 		mfiles = append(mfiles, MDFile{path, name, cont, auth, dat.Oldest, dat.Newest, tags, link})
 	}
 
