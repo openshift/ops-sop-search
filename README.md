@@ -2,20 +2,36 @@
 
 ## Description
 This program takes the SOP documents from the openshift repository and indexes them into an
-elasticsearch container as a way of making it easier to find an SOP document.
+elasticsearch container as a way of making it easier to find an SOP document. This information is then displayed in a web interface which allows you to easily search for the SOP document you want.
 
 ## How to Use 
-After the program indexes the SOP documents into the elasticsearch container, the user can then search for specific documents based on the name, the authors, the content, etc. using curl commands once inside the elasticsearch container.
+After launching the UI, simply type into the searchbox to find results. You can also choose to filter by the tags (aka the possible location of your document), author, and the name of the SOP to help narrow your search. You can further choose to sort your results by the last updated or by the most relevant. 
 
-**Example** 
+## Building the Docker Images 
+To build the images used in deployment.yml:
 
-`curl -X GET 'http://localhost:9200/sop/_search?q=_id%3Alogging'`
+### The Elasticsearch Image
 
-## How to Deploy
+1. build the image using the dockerfile in the elasticsearch folder
+2. push image to your repo
 
-**Additional Files Not Included**
-1. secret.yml file 
+### The Sop Search Image 
 
+1. build the image using the dockerfile
+2. push image to your repo
+
+### The UI Image 
+
+The UI image is slightly different as you have to make sure to update the build folder each time you change anything in the UI. 
+
+1. make sure your build folder has been updated
+  1. `npm run build`
+  2. if above fails, try `npm install` or `npm update` and then trying the above command again
+2. build the image using dockerfile in the ui folder
+3. push image to your repo
+
+## Deploying
+1. Create the ssh secret yml file
 ```
 apiVersion: v1
 data:
@@ -27,9 +43,7 @@ metadata:
   namespace: sop-search
 type: Opaque
 ```
-
-2. configmap.yml file 
-
+2. Create the configmap file
 ```
 apiVersion: v1
 kind: ConfigMap
@@ -37,18 +51,15 @@ metadata:
   name: configmap
   namespace: sop-search
 data:
-  time: 
-  elastic: 
-  repourl: 
-  reponame: 
-  gitscript: 
+  time: "5" #number of minutes before restarting routine
+  elastic: http://localhost:9200 #location of elasticsearch data
+  repourl: https://github.com/openshift/ops-sop-search/blob/master/ #repo url used for creating links
+  reponame: ops-sop-search #name of the repository you're indexing
+  gitscript: script.sh #location of the shell script
+  giturl: git@github.com:openshift/ops-sop-search.git #clone with ssh
 ```
-
-**Changes in Files**
-1. in deployment change quay.io link to your quay.io link
-
-### Building and Running
-1. build image
-2. push the image to a quay repo location
-3. inside the oc environment, apply the service_account, role, and role_binding yml files along with your created configmap and secret files
-4. apply the deployment yml file in the deploy folder
+3. Create the service_account, role, and role_binding (using files from deploy folder)
+4. Create the services (one for the UI and one for the elasticsearch using files from deploy folder)
+5. Create the routes (one for UI and one for elasticsearch using files from deploy folder)
+6. Deploy the deployment file
+7. Access the application via the web address given in the UI route
