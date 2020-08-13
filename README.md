@@ -31,10 +31,35 @@ The UI image is slightly different as you have to make sure to update the build 
 3. push image to your repo
 
 ## Deploying
-1. Create the ssh secret yml file (look at template for guidance)
-2. Create the configmap file (look at template for help)
-3. Create the service_account, role, and role_binding
-4. Create the services (one for the UI and one for the elasticsearch)
-5. Create the routes (one for UI and one for elasticsearch)
+1. Create the ssh secret yml file
+```
+apiVersion: v1
+data:
+  ssh-privatekey:
+  ssh-publickey:
+kind: Secret
+metadata:
+  name: ssh
+  namespace: sop-search
+type: Opaque
+```
+2. Create the configmap file
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+  namespace: sop-search
+data:
+  time: "5" #number of minutes before restarting routine
+  elastic: http://localhost:9200 #location of elasticsearch data
+  repourl: https://github.com/openshift/ops-sop-search/blob/master/ #repo url used for creating links
+  reponame: ops-sop-search #name of the repository you're indexing
+  gitscript: script.sh #location of the shell script
+  giturl: git@github.com:openshift/ops-sop-search.git #clone with ssh
+```
+3. Create the service_account, role, and role_binding (using files from deploy folder)
+4. Create the services (one for the UI and one for the elasticsearch using files from deploy folder)
+5. Create the routes (one for UI and one for elasticsearch using files from deploy folder)
 6. Deploy the deployment file
 7. Access the application via the web address given in the UI route
