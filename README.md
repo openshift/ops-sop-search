@@ -25,8 +25,8 @@ To build the images used in deployment.yml:
 The UI image is slightly different as you have to make sure to update the build folder each time you change anything in the UI. 
 
 1. make sure your build folder has been updated
-  1. `npm run build`
-  2. if above fails, try `npm install` or `npm update` and then trying the above command again
+   - `npm run build`
+   - if above fails, try `npm install` or `npm update` and then trying the above command again
 2. build the image using dockerfile in the ui folder
 3. push image to your repo
 
